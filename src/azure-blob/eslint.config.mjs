@@ -1,7 +1,21 @@
 import js from "@eslint/js";
 import globals from "globals";
-import { defineConfig } from "eslint/config";
 
-export default defineConfig([
-  { files: ["**/*.{js,mjs,cjs}"], plugins: { js }, extends: ["js/recommended"], languageOptions: { globals: globals.browser } },
-]);
+export default [
+    js.configs.recommended, // This provides the "extends: js/recommended" logic automatically
+    {
+        files: ["**/*.{js,mjs,cjs}"],
+        languageOptions: {
+            ecmaVersion: "latest",
+            sourceType: "module",
+            globals: {
+                ...globals.browser,
+                ...globals.node // Added node globals since you're likely using Azure functions/Node
+            }
+        },
+        rules: {
+            "no-unused-vars": "warn",
+            "no-undef": "error"
+        }
+    }
+];
