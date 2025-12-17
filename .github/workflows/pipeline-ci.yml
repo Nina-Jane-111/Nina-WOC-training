@@ -3,12 +3,14 @@ on: push
 jobs:
   lint:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./src/azure-blob
     steps:
       - name: Get code
         uses: actions/checkout@v6
       - name: Install dependencies
         run: npm install
-        working-directory: ./src/azure-blob
       - name: Run ESLint
         run: npx eslint .
   test:
