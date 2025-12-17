@@ -1,6 +1,6 @@
 name: Pipeline CI
-on: workflow_dispatch
-jobs: 
+on: push
+jobs:
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -10,11 +10,14 @@ jobs:
         run: echo "Done"
   test:
     runs-on: ubuntu-latest
-    steps: 
-      - name: step 2a
-        run: echo "Hello World"
-      - name: step 2b
-        run: echo "Done"
+    steps:
+      - name: Get code
+        uses: actions/checkout@v6
+      - name: Install dependencies
+        run: npm ci
+      - name: Run tests
+        run: npm test
+
   sonarqubeanalysis:
     runs-on: ubuntu-latest
     steps:
