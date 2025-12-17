@@ -90,6 +90,13 @@ app.delete('/files/:key', async (req, res) => {
     }
 });
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+// Only start the server if this file is run directly
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Export the app so Jest can test it without starting the server
+module.exports = app;
