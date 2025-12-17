@@ -49,4 +49,18 @@ if (response.statusCode !== 200) {
     expect(response.statusCode).toBe(400);
     expect(response.text).toBe('File name is required.');
   });
+  test('should return 500 if the Azure upload fails', async () => {
+    // Force the uploadFile mock to fail just for this test
+    const { BlobServiceClient } = require('@azure/storage-blob');
+    const mockServiceClient = new BlobServiceClient();
+    mockServiceClient.getContainerClient().getBlockBlobClient().uploadFile.mockRejectedValueOnce(new Error('Azure Crash'));
+
+    const response = await request(app)
+      .post('/upload')
+      .field('note', 'Faulty Upload')
+      .attach('file', Buffer.from('content'), 'test.txt');
+
+    expect(response.statusCode).toBe(500);
+    expect(response.text).toBe('Failed to upload file.');
+  });
 });
