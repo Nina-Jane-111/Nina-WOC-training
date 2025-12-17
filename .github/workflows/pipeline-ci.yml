@@ -3,11 +3,13 @@ on: push
 jobs:
   lint:
     runs-on: ubuntu-latest
-    steps:
-      - name: step 1a
-        run: echo "Hello World"
-      - name: step 1b
-        run: echo "Done"
+  steps:
+    - name: Get code
+      uses: actions/checkout@v6
+    - name: Install dependencies
+      run: npm install
+    - name: Run ESLint
+      run: eslint . --ext .js,.jsx,.ts,.tsx
   test:
     runs-on: ubuntu-latest
     steps:
