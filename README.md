@@ -2,6 +2,12 @@
 
 FileVault is a modern file uploading application with versions for both AWS S3 and Azure Blob Storage. It features a clean interface with light/dark mode toggle and file management capabilities.
 
+# FileVault Azure Blob
+
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=Nina-Jane-111_Nina-WOC-training&metric=alert_status)](https://sonarcloud.io/summary/overall?id=Nina-Jane-111_Nina-WOC-training)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=Nina-Jane-111_Nina-WOC-training&metric=coverage)](https://sonarcloud.io/summary/overall?id=Nina-Jane-111_Nina-WOC-training)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=Nina-Jane-111_Nina-WOC-training&metric=sqale_rating)](https://sonarcloud.io/summary/overall?id=Nina-Jane-111_Nina-WOC-training)
+
 ## Application Screenshots
 
 ### FileVault Interface
@@ -163,4 +169,3 @@ Open your browser and navigate to `http://localhost:3000`.
 - [ ] **File Search and Filtering**: Add functionality to search and filter files in the table.
 
 - [ ] **Drag and Drop Upload**: Enhance the upload feature with drag and drop functionality.
-
