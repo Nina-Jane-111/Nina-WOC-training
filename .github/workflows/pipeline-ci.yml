@@ -14,6 +14,9 @@ jobs:
       - name: Run ESLint
         run: npx eslint .
       - name: Run tests
+        env:
+          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
+          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
         run: npm test
   sonarqubeanalysis:
     runs-on: ubuntu-latest
