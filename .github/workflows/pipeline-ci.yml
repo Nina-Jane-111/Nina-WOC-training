@@ -13,16 +13,16 @@ jobs:
         run: npm install
       - name: Run ESLint
         run: npx eslint .
-      - name: Run tests
+      - name: Run tests with Coverage
         env:
           AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
           AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
           AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
         run: npm test
-  sonarqubeanalysis:
-    runs-on: ubuntu-latest
-    steps:
-      - name: step 3a
-        run: echo "Hello World"
-      - name: step 3b
-        run: echo "Done"
+      - name: SonarQube Scan
+        uses: SonarSource/sonarqube-scan-action@master
+        with:
+          projectBaseDir: src/azure-blob
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
