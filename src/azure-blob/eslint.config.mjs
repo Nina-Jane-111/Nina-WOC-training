@@ -16,7 +16,8 @@ export default [
         },
         rules: {
             "no-unused-vars": "warn",
-            "no-undef": "error"
+            "no-undef": "error",
+            "no-console": "off" // Usually helpful to turn off for backend debugging
         }
     }
 ];
