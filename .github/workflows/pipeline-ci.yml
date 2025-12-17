@@ -1,7 +1,7 @@
 name: Pipeline CI
 on: push
 jobs:
-  lint and unit tests:
+  lintAndUnitTests:
     runs-on: ubuntu-latest
     defaults:
       run:
