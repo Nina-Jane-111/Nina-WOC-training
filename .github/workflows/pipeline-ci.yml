@@ -32,19 +32,19 @@ jobs:
         run: npm test
 
     SonarQube Scan:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./src/azure-blob
-    steps:
-      - name: Get code
-        uses: actions/checkout@v6
-      - name: Install dependencies
-        run: npm install
-      - name: SonarQube Scan
-        uses: SonarSource/sonarqube-scan-action@master
-        with:
-          projectBaseDir: src/azure-blob
-        env:
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      runs-on: ubuntu-latest
+      defaults:
+        run:
+          working-directory: ./src/azure-blob
+      steps:
+        - name: Get code
+          uses: actions/checkout@v6
+        - name: Install dependencies
+          run: npm install
+        - name: SonarQube Scan
+          uses: SonarSource/sonarqube-scan-action@master
+          with:
+            projectBaseDir: src/azure-blob
+          env:
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+            SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
