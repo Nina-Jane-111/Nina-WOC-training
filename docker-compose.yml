@@ -1,0 +1,10 @@
+services:
+  filevault-app:
+    build: ./src/azure-blob
+    container_name: filevault-service
+    ports:
+      - "3000:3000"
+    environment:
+      - AZURE_STORAGE_ACCOUNT_NAME=${AZURE_STORAGE_ACCOUNT_NAME}
+      - AZURE_STORAGE_ACCOUNT_KEY=${AZURE_STORAGE_ACCOUNT_KEY}
+      - AZURE_CONTAINER_NAME=${AZURE_CONTAINER_NAME}
