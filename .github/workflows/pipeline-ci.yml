@@ -14,7 +14,7 @@ jobs:
       - name: Run ESLint
         run: npx eslint .
 
-  Unit Tests SonarQube:
+  UnitTestsSonarQube:
     runs-on: ubuntu-latest
     defaults:
       run:
