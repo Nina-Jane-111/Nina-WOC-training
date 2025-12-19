@@ -3,6 +3,7 @@
 
 # Environment variables
 **/.env
+infra.env
 
 # Logs
 logs/
@@ -29,3 +30,9 @@ Thumbs.db
 
 # Uploads
 **/uploads/
+
+# Local terraform directories
+.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfplan

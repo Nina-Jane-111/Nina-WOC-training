@@ -1,6 +1,14 @@
 name: Pipeline CI
-on: [push, pull_request]
-jobs:
+on:
+  # Triggers when 'Create Infrastructure' finishes
+  workflow_run:
+    workflows: ["Create Infrastructure"]
+    types:
+      - completed
+  # Keep these if you still want local testing on PRs
+  push:
+    branches: [main]
+  pull_request:jobs:
   Linter:
     runs-on: ubuntu-latest
     defaults:
@@ -16,20 +24,36 @@ jobs:
 
   UnitTestsSonarQube:
     runs-on: ubuntu-latest
+    needs: Linter
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     defaults:
       run:
         working-directory: ./src/azure-blob
     steps:
       - name: Get code
         uses: actions/checkout@v6
+
+      # 1. Download the artifact from the 'Create Infrastructure' run
+      - name: Download Infra Config
+        uses: actions/download-artifact@v4
+        with:
+          name: infra-config
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          # This ID specifically targets the infrastructure run that triggered this CI
+          run-id: ${{ github.event.workflow_run.id }}
+
       - name: Install dependencies
         run: npm install
+
+      # 2. Use the values from the artifact instead of GitHub secrets
       - name: Run tests with Coverage
+        run: |
+          # Loads the variables from the file into the current shell session
+          export $(cat ../../../infra.env | xargs)
+          npm test
         env:
-          AZURE_STORAGE_ACCOUNT_NAME: ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }}
-          AZURE_STORAGE_ACCOUNT_KEY: ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-          AZURE_CONTAINER_NAME: ${{ secrets.AZURE_CONTAINER_NAME }}
-        run: npm test
+          PORT: 3000
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
         with:

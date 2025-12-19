@@ -1,0 +1,56 @@
+# This is the name displayed in the GitHub Actions UI
+name: "Create Infrastructure"
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+
+# Permissions needed for Azure OIDC authentication
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+      ARM_USE_OIDC: true
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Plan
+        run: terraform plan -out=main.tfplan
+
+      # This step only runs when code is pushed directly to 'main'
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve main.tfplan
+
+      - name: Export Terraform Outputs
+        run: |
+          echo "AZURE_STORAGE_ACCOUNT_NAME=$(terraform output -raw storage_account_name)" >> infra.env
+          echo "AZURE_STORAGE_ACCOUNT_KEY=$(terraform output -raw storage_account_key)" >> infra.env
+          echo "AZURE_CONTAINER_NAME=$(terraform output -raw container_name)" >> infra.env
+
+      # ADD HERE: Upload that file as an artifact
+      - name: Upload Infra Env
+        uses: actions/upload-artifact@v4
+        with:
+          name: infra-config
+          path: infra.env
