@@ -56,12 +56,16 @@ jobs:
       # 2. Use the values from the artifact instead of GitHub secrets
       - name: Run tests with Coverage
         run: |
-          if [ -f "infra.env" ]; then
-            # This line replaces your local .env file logic
+          # Step out of src/azure-blob to find the file in the root
+          if [ -f "../../../infra.env" ]; then
+            export $(grep -v '^#' ../../../infra.env | xargs)
+            npm test
+          elif [ -f "infra.env" ]; then
             export $(grep -v '^#' infra.env | xargs)
             npm test
           else
-            echo "Error: infra.env not found!"
+            echo "Error: infra.env not found in root or current dir!"
+            ls -R ../../../ # Debugging line to see where it is
             exit 1
           fi
         env:
