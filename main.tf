@@ -6,14 +6,14 @@ terraform {
     }
   }
 
-backend "azurerm" {
-    resource_group_name  = "filevault_resource"
-    storage_account_name = "filevaultstorage01"
-    container_name       = "vault-data" # The container you created earlier
-    key                  = "terraform.tfstate"
+  backend "azurerm" {
+    # Point to the PERMANENT management group
+    resource_group_name  = "nina-mgmt-rg" 
+    storage_account_name = "ninatfstate1766340813"
+    container_name       = "tfstate"
+    key                  = "filevault.tfstate"
     use_oidc             = true
   }
-}
 
 provider "azurerm" {
     features {}

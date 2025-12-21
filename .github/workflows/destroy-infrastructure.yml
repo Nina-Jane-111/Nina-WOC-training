@@ -50,5 +50,8 @@ jobs:
 
       - name: Terraform Plan Destroy
         run: terraform plan -destroy -lock=false
+
       - name: Terraform Destroy
-        run: terraform destroy -auto-approve -lock=false
+        run: |
+          # This will delete filevault_resource but leave management_resources alone
+          terraform destroy -auto-approve
