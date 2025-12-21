@@ -9,8 +9,9 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
-  actions: read # Required to download artifacts from the previous run
+  id-token: write # Required for Azure OIDC login
+  contents: read # Required to checkout code
+  actions: read # Required to download artifacts
 
 jobs:
   Linter:
