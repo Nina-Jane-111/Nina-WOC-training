@@ -1,9 +1,8 @@
 terraform {
   required_providers {
-    azurerm = { ... }
-    time = {
-      source  = "hashicorp/time"
-      version = "0.11.1"
+    azurerm = {
+      source  = "hashicorp/azurerm"
+      version = "~> 4.0" # This tells it to use version 4.x
     }
   }
 
@@ -27,14 +26,13 @@ resource "azurerm_resource_group" "filevault_resource" {
 }
 
 resource "azurerm_storage_account" "filevaultstorage01" {
-  name                     = "filevaultstorage01"
-  resource_group_name      = "filevault_resource"
-  location                 = "uksouth"
+  name                     = "filevaultstorage01" # You define this name here
+  # This reference forces Terraform to wait for the Resource Group
+  resource_group_name      = azurerm_resource_group.filevault_resource.name
+  location                 = azurerm_resource_group.filevault_resource.location
   account_tier             = "Standard"
   account_replication_type = "LRS"
-  
-  # This matches the "Configuration" blade settings
-  min_tls_version           = "TLS1_2"
+  min_tls_version          = "TLS1_2"
 }
 
 resource "azurerm_storage_container" "filevault_container" {
