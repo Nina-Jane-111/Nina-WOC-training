@@ -5,8 +5,9 @@ on:
     workflows: ["Create Infrastructure"]
     types:
       - completed
-# Optional: Manual trigger for testing
-workflow_dispatch:
+  # Optional: Manual trigger for testing
+  # Only run if Linter passed AND the infra workflow succeeded
+    if: ${{ always() && (github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch') }}workflow_dispatch:
 
 permissions:
   contents: read
@@ -14,13 +15,15 @@ permissions:
 
 jobs:
   Linter:
+    # Only run if the infra workflow succeeded
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: ./src/azure-blob
     steps:
       - name: Get code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
       - name: Install dependencies
         run: npm install
       - name: Run ESLint
@@ -29,13 +32,14 @@ jobs:
   UnitTestsSonarQube:
     runs-on: ubuntu-latest
     needs: Linter
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    # Only run if Linter passed AND the infra workflow succeeded
+    if: ${{ always() && (github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch') }}
     defaults:
       run:
         working-directory: ./src/azure-blob
     steps:
       - name: Get code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       # 1. Download the artifact from the 'Create Infrastructure' run
       - name: Download Infra Config
