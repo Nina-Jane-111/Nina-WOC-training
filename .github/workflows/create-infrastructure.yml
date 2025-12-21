@@ -42,11 +42,13 @@ jobs:
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: terraform apply -auto-approve main.tfplan
 
-      - name: Export Terraform Outputs
+      - name: Save Environment Variables
+        id: terraform_outputs
         run: |
+          # Use terraform output to get values from the state file
           echo "AZURE_STORAGE_ACCOUNT_NAME=$(terraform output -raw storage_account_name)" >> infra.env
           echo "AZURE_STORAGE_ACCOUNT_KEY=$(terraform output -raw storage_account_key)" >> infra.env
-          echo "AZURE_CONTAINER_NAME=$(terraform output -raw container_name)" >> infra.env
+          echo "AZURE_CONTAINER_NAME=vault-data" >> infra.env
 
       # ADD HERE: Upload that file as an artifact
       - name: Upload Infra Env

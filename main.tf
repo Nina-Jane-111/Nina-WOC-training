@@ -56,12 +56,13 @@ output "acr_login_server" {
 }
 
 output "storage_account_name" {
-  value = azurerm_storage_account.filevaultstorage01.name
+  value     = azurerm_storage_account.filevaultstorage01.name
+  sensitive = false 
 }
 
 output "storage_account_key" {
   value     = azurerm_storage_account.filevaultstorage01.primary_access_key
-  sensitive = true # Keeps the key out of standard console logs
+  sensitive = true # Keeps the key hidden in GitHub logs
 }
 
 output "container_name" {

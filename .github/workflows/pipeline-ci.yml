@@ -45,6 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: infra-config
+          path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # This ID specifically targets the infrastructure run that triggered this CI
           run-id: ${{ github.event.workflow_run.id }}
@@ -54,10 +55,15 @@ jobs:
 
       # 2. Use the values from the artifact instead of GitHub secrets
       - name: Run tests with Coverage
-        run: |
-          # Loads the variables from the file into the current shell session
-          export $(cat ../../../infra.env | xargs)
-          npm test
+run: |
+          if [ -f "infra.env" ]; then
+            # This line replaces your local .env file logic
+            export $(grep -v '^#' infra.env | xargs)
+            npm test
+          else
+            echo "Error: infra.env not found!"
+            exit 1
+          fi
         env:
           PORT: 3000
 
