@@ -31,10 +31,16 @@ jobs:
       # Step 1: Manually delete the Container Instance managed by the CLI
       - name: Delete Container Instance
         run: |
-          az container delete \
-            --resource-group filevault_resource \
-            --name filevault-app-service \
-            --yes
+          # Check if the resource group exists first
+          if [ $(az group exists --name filevault_resource) = "true" ]; then
+            echo "Resource group exists. Proceeding with container deletion..."
+            az container delete \
+              --resource-group filevault_resource \
+              --name filevault-app-service \
+              --yes
+          else
+            echo "Resource group not found. Skipping container deletion."
+          fi
 
       - name: Setup Terraform
         uses: hashicorp/setup-terraform@v3
