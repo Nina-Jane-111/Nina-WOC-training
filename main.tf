@@ -50,6 +50,35 @@ resource "azurerm_container_registry" "acr" {
   admin_enabled       = true
 }
 
+resource "azurerm_container_group" "filevault_app" {
+  name                = "filevault-app-service"
+  location            = azurerm_resource_group.filevault_resource.location
+  resource_group_name = azurerm_resource_group.filevault_resource.name
+  ip_address_type     = "Public"
+  dns_name_label      = "nina-filevault-app"
+  os_type             = "Linux"
+
+  container {
+    name   = "filevault-app"
+    # Use the login_server property so it's always dynamic
+    image  = "${azurerm_container_registry.acr.login_server}/file-vault-app:latest"
+    cpu    = "0.5"
+    memory = "1.5"
+
+    ports {
+      port     = 3000
+      protocol = "TCP"
+    }
+  }
+
+  # THIS BLOCK IS REQUIRED to pull from your private ACR
+  image_registry_credential {
+    server   = azurerm_container_registry.acr.login_server
+    username = azurerm_container_registry.acr.admin_username
+    password = azurerm_container_registry.acr.admin_password
+  }
+}
+
 # Optional: Output the login server URL for your Docker commands
 output "acr_login_server" {
   value = azurerm_container_registry.acr.login_server

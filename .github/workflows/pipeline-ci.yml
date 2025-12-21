@@ -75,3 +75,45 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+
+  Deploy:
+    runs-on: ubuntu-latest
+    needs: UnitTestsSonarQube # Only deploy if tests pass!
+    if: github.ref == 'refs/heads/main' # Only deploy from the main branch
+
+    steps:
+      - name: Get code
+        uses: actions/checkout@v4
+
+      - name: Download Infra Config
+        uses: actions/download-artifact@v4
+        with:
+          name: infra-config
+          path: ./src/azure-blob
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          run-id: ${{ github.event.workflow_run.id }}
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Build and Push to ACR
+        run: |
+          # Load the variables from your artifact
+          export $(grep -v '^#' ./src/azure-blob/infra.env | xargs)
+
+          # Login to ACR using Azure CLI
+          az acr login --name filevaultregistry01
+
+          # Build the Docker image
+          docker build -t filevaultregistry01.azurecr.io/file-vault-app:${{ github.sha }} ./src/azure-blob
+
+          # Push the image to your registry
+          docker push filevaultregistry01.azurecr.io/file-vault-app:${{ github.sha }}
+
+          # Also tag it as 'latest' for easy deployment
+          docker tag filevaultregistry01.azurecr.io/file-vault-app:${{ github.sha }} filevaultregistry01.azurecr.io/file-vault-app:latest
+          docker push filevaultregistry01.azurecr.io/file-vault-app:latest
