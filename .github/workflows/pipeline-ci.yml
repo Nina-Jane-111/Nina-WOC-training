@@ -45,7 +45,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: infra-config
-          path: ./
+          path: ./src/azure-blob
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # This ID specifically targets the infrastructure run that triggered this CI
           run-id: ${{ github.event.workflow_run.id }}
@@ -56,20 +56,13 @@ jobs:
       # 2. Use the values from the artifact instead of GitHub secrets
       - name: Run tests with Coverage
         run: |
-          # Look for infra.env in the project root (3 levels up)
-          if [ -f "../../../infra.env" ]; then
-            echo "Found infra.env in root. Exporting variables..."
-            export $(grep -v '^#' ../../../infra.env | xargs)
-            npm test
-          elif [ -f "infra.env" ]; then
-            echo "Found infra.env in current directory. Exporting variables..."
+          if [ -f "infra.env" ]; then
+            echo "Success: infra.env found in local directory."
             export $(grep -v '^#' infra.env | xargs)
             npm test
           else
-            echo "Error: infra.env not found!"
-            echo "Current directory: $(pwd)"
-            echo "Listing files in root:"
-            ls -R ../../../
+            echo "Error: infra.env still not found!"
+            ls -la # Show hidden files in current directory
             exit 1
           fi
         env:
