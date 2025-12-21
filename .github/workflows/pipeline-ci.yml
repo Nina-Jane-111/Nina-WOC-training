@@ -55,7 +55,7 @@ jobs:
 
       # 2. Use the values from the artifact instead of GitHub secrets
       - name: Run tests with Coverage
-run: |
+        run: |
           if [ -f "infra.env" ]; then
             # This line replaces your local .env file logic
             export $(grep -v '^#' infra.env | xargs)
