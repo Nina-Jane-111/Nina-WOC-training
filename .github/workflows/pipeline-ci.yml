@@ -5,10 +5,14 @@ on:
     workflows: ["Create Infrastructure"]
     types:
       - completed
-  # Keep these if you still want local testing on PRs
-  push:
-    branches: [main]
-  pull_request:jobs:
+# Optional: Manual trigger for testing
+workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read # Required to download artifacts from the previous run
+
+jobs:
   Linter:
     runs-on: ubuntu-latest
     defaults:
