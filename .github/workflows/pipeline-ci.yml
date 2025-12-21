@@ -115,6 +115,7 @@ jobs:
             --name filevault-app-service \
             --image filevaultregistry01.azurecr.io/file-vault-app:latest \
             --cpu 1 --memory 1.5 \
+            --os-type Linux \
             --registry-login-server filevaultregistry01.azurecr.io \
             --registry-username $(az acr credential show --name filevaultregistry01 --query "username" -o tsv) \
             --registry-password $(az acr credential show --name filevaultregistry01 --query "passwords[0].value" -o tsv) \
