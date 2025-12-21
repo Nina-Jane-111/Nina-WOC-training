@@ -14,6 +14,7 @@ terraform {
     key                  = "filevault.tfstate"
     use_oidc             = true
   }
+}
 
 provider "azurerm" {
     features {}
