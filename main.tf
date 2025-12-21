@@ -5,6 +5,14 @@ terraform {
       version = "~> 4.0" # This tells it to use version 4.x
     }
   }
+
+backend "azurerm" {
+    resource_group_name  = "filevault_resource"
+    storage_account_name = "filevaultstorage01"
+    container_name       = "vault-data" # The container you created earlier
+    key                  = "terraform.tfstate"
+    use_oidc             = true
+  }
 }
 
 provider "azurerm" {
