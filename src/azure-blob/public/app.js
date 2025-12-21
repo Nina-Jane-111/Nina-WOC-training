@@ -95,3 +95,4 @@ themeToggle.addEventListener('change', function() {
     document.documentElement.setAttribute('data-theme', theme);
     localStorage.setItem('theme', theme);
 });
+
