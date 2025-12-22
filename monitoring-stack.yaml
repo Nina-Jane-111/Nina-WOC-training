@@ -39,6 +39,7 @@ properties:
     - name: grafana
       properties:
         image: grafana/grafana:latest
+        user: "0" # <--- CRITICAL: Runs container as root for volume permissions
         resources:
           requests:
             cpu: 0.5
