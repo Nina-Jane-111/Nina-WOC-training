@@ -46,7 +46,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: infra-config
-          path: .
+          path: ./src/azure-blob
+          merge-multiple: true # This prevents it from creating an extra 'infra-config' folder
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # This ID specifically targets the infrastructure run that triggered this CI
           run-id: ${{ github.event.workflow_run.id }}
