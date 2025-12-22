@@ -45,6 +45,16 @@ properties:
             memoryInGB: 1.0
         ports:
           - port: 3001
+      environmentVariables:
+        - name: GF_DATABASE_TYPE
+          value: sqlite3
+        - name: GF_DATABASE_WAL
+          value: "true"
+        - name: GF_DATABASE_URL
+          value: sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL
+      volumeMounts:
+        - name: prometheus-config-volume
+          mountPath: /var/lib/grafana # Keep your persistence mount
   osType: Linux
   ipAddress:
     type: Public
