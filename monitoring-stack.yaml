@@ -51,7 +51,9 @@ properties:
           - name: GF_DATABASE_WAL
             value: "true"
           - name: GF_DATABASE_URL
-            value: sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL
+            value: sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL # OPTIONAL: Allow initial login with default admin/admin
+          - name: GF_SECURITY_ADMIN_PASSWORD
+            value: admin
         volumeMounts:
           - name: prometheus-config-volume
             mountPath: /var/lib/grafana # Keep your persistence mount
