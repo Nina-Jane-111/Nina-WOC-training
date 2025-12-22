@@ -39,7 +39,6 @@ properties:
     - name: grafana
       properties:
         image: grafana/grafana:latest
-        user: "0" # <--- CRITICAL: Runs container as root for volume permissions
         resources:
           requests:
             cpu: 0.5
@@ -52,12 +51,11 @@ properties:
           - name: GF_DATABASE_WAL
             value: "true"
           - name: GF_DATABASE_URL
-            value: sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL # OPTIONAL: Allow initial login with default admin/admin
-          - name: GF_SECURITY_ADMIN_PASSWORD
-            value: admin
-        volumeMounts:
+            value: sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL        volumeMounts:
           - name: prometheus-config-volume
             mountPath: /var/lib/grafana # Keep your persistence mount
+            # subPath helps avoid root-level permission issues on the share
+            subPath: grafana-data
   osType: Linux
   ipAddress:
     type: Public
