@@ -130,6 +130,17 @@ jobs:
             --account-name $AZURE_STORAGE_ACCOUNT_NAME \
             --account-key $AZURE_STORAGE_ACCOUNT_KEY
 
+      # NEW STEP: Fix permissions for Grafana
+      - name: Pre-create Grafana Directory
+        run: |
+          export $(grep -v '^#' infra.env | xargs)
+          # This creates the directory so Grafana doesn't have to (which it fails at)
+          az storage directory create \
+            --share-name prometheus-config \
+            --name grafana-data \
+            --account-name $AZURE_STORAGE_ACCOUNT_NAME \
+            --account-key $AZURE_STORAGE_ACCOUNT_KEY
+
       - name: Deploy Monitoring Stack
         run: |
           # Load the values from the artifact
