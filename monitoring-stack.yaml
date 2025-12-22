@@ -52,6 +52,8 @@ properties:
         ports:
           - port: 3001
         environmentVariables:
+          - name: GF_SERVER_HTTP_PORT
+            value: "3001"
           - name: GF_LOG_MODE
             value: "console" # Forces output to stdout so 'az container logs' works
           - name: GF_LOG_LEVEL
