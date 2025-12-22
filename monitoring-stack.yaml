@@ -46,6 +46,10 @@ properties:
         ports:
           - port: 3001
         environmentVariables:
+          - name: GF_LOG_MODE
+            value: "console" # Forces output to stdout so 'az container logs' works
+          - name: GF_LOG_LEVEL
+            value: "debug" # Provides the most detail for troubleshooting
           - name: GF_DATABASE_TYPE
             value: sqlite3
           - name: GF_DATABASE_WAL
@@ -54,9 +58,9 @@ properties:
             value: "sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL"
           - name: GF_SECURITY_ADMIN_PASSWORD
             value: admin
-        volumeMounts:
-          - name: prometheus-config-volume
-            mountPath: /var/lib/grafana # Keep your persistence mount
+  #        volumeMounts:
+  #          - name: prometheus-config-volume
+  #            mountPath: /var/lib/grafana # Keep your persistence mount
   osType: Linux
   ipAddress:
     type: Public
