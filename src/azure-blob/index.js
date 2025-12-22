@@ -90,6 +90,16 @@ app.delete('/files/:key', async (req, res) => {
     }
 });
 
+const client = require('prom-client');
+const collectDefaultMetrics = client.collectDefaultMetrics;
+collectDefaultMetrics(); // This tracks CPU and Memory automatically!
+
+// Create a path for Prometheus to "scrape"
+app.get('/metrics', async (req, res) => {
+  res.set('Content-Type', client.register.contentType);
+  res.end(await client.register.metrics());
+});
+
 // Only start the server if this file is run directly
 if (require.main === module) {
   const PORT = process.env.PORT || 3000;
