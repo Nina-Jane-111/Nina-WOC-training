@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: infra-config
-          path: ./src/azure-blob
+          path: .
           merge-multiple: true # This prevents it from creating an extra 'infra-config' folder
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # This ID specifically targets the infrastructure run that triggered this CI
@@ -58,9 +58,9 @@ jobs:
       # 2. Use the values from the artifact instead of GitHub secrets
       - name: Run tests with Coverage
         run: |
-          if [ -f "infra.env" ]; then
+          if [ -f "../../infra.env" ]; then
             echo "Success: infra.env found in local directory."
-            export $(grep -v '^#' infra.env | xargs)
+            export $(grep -v '^#' ../../infra.env | xargs)
             npm test
           else
             echo "Error: infra.env still not found!"
@@ -89,7 +89,8 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: infra-config
-          path: ./src/azure-blob
+          path: .
+          merge-multiple: true # Prevent the extra 'infra-config' folder
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
@@ -111,11 +112,11 @@ jobs:
       # Create the Cloud "Folder" (File Share) if it doesn't exist
       - name: Create Azure File Share
         run: |
+          export $(grep -v '^#' infra.env | xargs)
           az storage share create \
             --name prometheus-config \
-            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} \
-            --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
-
+            --account-name $AZURE_STORAGE_ACCOUNT_NAME \            
+            --account-key $AZURE_STORAGE_ACCOUNT_KEY
       # Upload your local prometheus.yml to that Cloud Folder
       - name: Upload Prometheus Config
         run: |
@@ -123,8 +124,8 @@ jobs:
           az storage file upload \
             --share-name prometheus-config \
             --source ./prometheus.yml \
-            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} \
-            --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+            --account-name $AZURE_STORAGE_ACCOUNT_NAME \
+            --account-key $AZURE_STORAGE_ACCOUNT_KEY
 
       - name: Deploy Monitoring Stack
         run: |
