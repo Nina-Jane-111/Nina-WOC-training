@@ -113,10 +113,9 @@ jobs:
       - name: Create Azure File Share
         run: |
           export $(grep -v '^#' infra.env | xargs)
-          az storage share create \
-            --name prometheus-config \
-            --account-name $AZURE_STORAGE_ACCOUNT_NAME \            
-            --account-key $AZURE_STORAGE_ACCOUNT_KEY
+          # Ensure this is one continuous line
+          az storage share create --name prometheus-config --account-name $AZURE_STORAGE_ACCOUNT_NAME --account-key $AZURE_STORAGE_ACCOUNT_KEY
+
       # Upload your local prometheus.yml to that Cloud Folder
       - name: Upload Prometheus Config
         run: |
