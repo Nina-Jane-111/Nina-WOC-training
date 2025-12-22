@@ -88,7 +88,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: infra-config
-          path: ./src/azure-blob
+          path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           run-id: ${{ github.event.workflow_run.id }}
 
@@ -99,7 +99,7 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
-      - name: Build, Push, and Deploy
+      - name: Build & Push
         run: |
           export $(grep -v '^#' ./src/azure-blob/infra.env | xargs)
 
@@ -108,20 +108,34 @@ jobs:
           docker build -t filevaultregistry01.azurecr.io/file-vault-app:latest ./src/azure-blob
           docker push filevaultregistry01.azurecr.io/file-vault-app:latest
 
-          # 2. Deploy/Update the Container via CLI
-          # This command creates the container if it doesn't exist, or updates it if it does.
+      # Create the Cloud "Folder" (File Share) if it doesn't exist
+      - name: Create Azure File Share
+        run: |
+          az storage share create \
+            --name prometheus-config \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} \
+            --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+      # Upload your local prometheus.yml to that Cloud Folder
+      - name: Upload Prometheus Config
+        run: |
+          az storage file upload \
+            --share-name prometheus-config \
+            --source ./prometheus.yml \
+            --account-name ${{ secrets.AZURE_STORAGE_ACCOUNT_NAME }} \
+            --account-key ${{ secrets.AZURE_STORAGE_ACCOUNT_KEY }}
+
+      - name: Deploy Monitoring Stack
+        run: |
+          # 1. Load the values from the artifact
+          export $(grep -v '^#' ./src/azure-blob/infra.env | xargs)
+
+          # 2. Fill in the YAML template with real values
+          sed -i "s|<REGISTRY_NAME>|filevaultregistry01|g" monitoring-stack.yaml
+          sed -i "s|<STORAGE_ACCOUNT_NAME>|$AZURE_STORAGE_ACCOUNT_NAME|g" monitoring-stack.yaml
+          sed -i "s|<STORAGE_ACCOUNT_KEY>|$AZURE_STORAGE_ACCOUNT_KEY|g" monitoring-stack.yaml
+
+          # 3. Deploy using the completed YAML file
           az container create \
             --resource-group filevault_resource \
-            --name filevault-app-service \
-            --image filevaultregistry01.azurecr.io/file-vault-app:latest \
-            --cpu 1 --memory 1.5 \
-            --os-type Linux \
-            --registry-login-server filevaultregistry01.azurecr.io \
-            --registry-username $(az acr credential show --name filevaultregistry01 --query "username" -o tsv) \
-            --registry-password $(az acr credential show --name filevaultregistry01 --query "passwords[0].value" -o tsv) \
-            --dns-name-label nina-filevault-app \
-            --ports 3000 \
-            --environment-variables \
-                AZURE_STORAGE_ACCOUNT_NAME=$AZURE_STORAGE_ACCOUNT_NAME \
-                AZURE_STORAGE_ACCOUNT_KEY=$AZURE_STORAGE_ACCOUNT_KEY \
-                AZURE_CONTAINER_NAME=vault-data
+            --file monitoring-stack.yaml

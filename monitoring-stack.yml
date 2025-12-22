@@ -1,0 +1,60 @@
+apiVersion: "2019-12-01"
+location: uksouth
+name: filevault-monitoring-stack
+type: Microsoft.ContainerInstance/containerGroups
+properties:
+  containers:
+    - name: file-vault-app
+      properties:
+        image: <REGISTRY_NAME>.azurecr.io/file-vault-app:latest
+        resources:
+          requests:
+            cpu: 1.0
+            memoryInGB: 1.5
+        ports:
+          - port: 3000
+        environmentVariables:
+          - name: AZURE_STORAGE_ACCOUNT_NAME
+            value: <STORAGE_ACCOUNT_NAME>
+          - name: AZURE_STORAGE_ACCOUNT_KEY
+            value: <STORAGE_ACCOUNT_KEY>
+          - name: AZURE_CONTAINER_NAME
+            value: vault-data
+    - name: prometheus
+      properties:
+        image: prom/prometheus:latest
+        resources:
+          requests:
+            cpu: 0.5
+            memoryInGB: 1.0
+        ports:
+          - port: 9090
+        volumeMounts:
+          - name: prometheus-config-volume
+            mountPath: /etc/prometheus/ # Prometheus looks here for prometheus.yml
+    - name: grafana
+      properties:
+        image: grafana/grafana:latest
+        resources:
+          requests:
+            cpu: 0.5
+            memoryInGB: 1.0
+        ports:
+          - port: 3001
+  osType: Linux
+  ipAddress:
+    type: Public
+    dnsNameLabel: nina-monitor
+    ports:
+      - protocol: tcp
+        port: 3000
+      - protocol: tcp
+        port: 9090
+      - protocol: tcp
+        port: 3001
+  volumes:
+    - name: prometheus-config-volume
+      azureFile:
+        shareName: prometheus-config
+        storageAccountName: <STORAGE_ACCOUNT_NAME>
+        storageAccountKey: <STORAGE_ACCOUNT_KEY>
