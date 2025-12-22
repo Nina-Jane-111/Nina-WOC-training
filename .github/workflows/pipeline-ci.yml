@@ -46,7 +46,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: infra-config
-          path: ./src/azure-blob
+          path: .
           github-token: ${{ secrets.GITHUB_TOKEN }}
           # This ID specifically targets the infrastructure run that triggered this CI
           run-id: ${{ github.event.workflow_run.id }}
@@ -101,8 +101,7 @@ jobs:
 
       - name: Build & Push
         run: |
-          export $(grep -v '^#' ./src/azure-blob/infra.env | xargs)
-
+          export $(grep -v '^#' infra.env | xargs)
           # 1. Push the image
           az acr login --name filevaultregistry01
           docker build -t filevaultregistry01.azurecr.io/file-vault-app:latest ./src/azure-blob
@@ -119,6 +118,7 @@ jobs:
       # Upload your local prometheus.yml to that Cloud Folder
       - name: Upload Prometheus Config
         run: |
+          export $(grep -v '^#' infra.env | xargs)
           az storage file upload \
             --share-name prometheus-config \
             --source ./prometheus.yml \
@@ -128,8 +128,7 @@ jobs:
       - name: Deploy Monitoring Stack
         run: |
           # 1. Load the values from the artifact
-          export $(grep -v '^#' ./src/azure-blob/infra.env | xargs)
-
+          export $(grep -v '^#' infra.env | xargs)
           # 2. Fill in the YAML template with real values
           sed -i "s|<REGISTRY_NAME>|filevaultregistry01|g" monitoring-stack.yaml
           sed -i "s|<STORAGE_ACCOUNT_NAME>|$AZURE_STORAGE_ACCOUNT_NAME|g" monitoring-stack.yaml
