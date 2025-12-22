@@ -61,12 +61,18 @@ properties:
           - name: GF_DATABASE_WAL
             value: "true"
           - name: GF_DATABASE_URL
-            value: "sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL"
+            value: "sqlite3:///tmp/grafana.db?cache=private&mode=rwc&_journal_mode=WAL"            value: admin
           - name: GF_SECURITY_ADMIN_PASSWORD
             value: admin
-  #        volumeMounts:
-  #          - name: prometheus-config-volume
-  #            mountPath: /var/lib/grafana # Keep your persistence mount
+          - name: GF_PATHS_DATA
+            value: /var/lib/grafana
+          - name: GF_PATHS_LOGS
+            value: /tmp/grafana_logs
+          - name: GF_PATHS_PLUGINS
+            value: /var/lib/grafana/plugins
+        volumeMounts:
+            - name: prometheus-config-volume
+              mountPath: /var/lib/grafana # Keep your persistence mount
   osType: Linux
   ipAddress:
     type: Public
