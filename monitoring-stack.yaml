@@ -3,6 +3,10 @@ location: uksouth
 name: filevault-monitoring-stack
 type: Microsoft.ContainerInstance/containerGroups
 properties:
+  imageRegistryCredentials:
+    - server: <REGISTRY_NAME>.azurecr.io
+      username: <REGISTRY_USERNAME>
+      password: <REGISTRY_PASSWORD>
   containers:
     - name: file-vault-app
       properties:

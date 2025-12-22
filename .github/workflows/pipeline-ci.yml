@@ -132,14 +132,21 @@ jobs:
 
       - name: Deploy Monitoring Stack
         run: |
-          # 1. Load the values from the artifact
+          # Load the values from the artifact
           export $(grep -v '^#' infra.env | xargs)
-          # 2. Fill in the YAML template with real values
+
+          # Get ACR credentials dynamically
+          ACR_USERNAME=$(az acr credential show --name filevaultregistry01 --query "username" -o tsv)
+          ACR_PASSWORD=$(az acr credential show --name filevaultregistry01 --query "passwords[0].value" -o tsv)
+
+          # Fill in the YAML template with real values
           sed -i "s|<REGISTRY_NAME>|filevaultregistry01|g" monitoring-stack.yaml
+          sed -i "s|<REGISTRY_USERNAME>|$ACR_USERNAME|g" monitoring-stack.yaml
+          sed -i "s|<REGISTRY_PASSWORD>|$ACR_PASSWORD|g" monitoring-stack.yaml
           sed -i "s|<STORAGE_ACCOUNT_NAME>|$AZURE_STORAGE_ACCOUNT_NAME|g" monitoring-stack.yaml
           sed -i "s|<STORAGE_ACCOUNT_KEY>|$AZURE_STORAGE_ACCOUNT_KEY|g" monitoring-stack.yaml
 
-          # 3. Deploy using the completed YAML file
+          # Deploy using the completed YAML file
           az container create \
             --resource-group filevault_resource \
             --file monitoring-stack.yaml
