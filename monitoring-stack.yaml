@@ -39,6 +39,12 @@ properties:
     - name: grafana
       properties:
         image: grafana/grafana:latest
+        command:
+          [
+            "/bin/sh",
+            "-c",
+            "grafana-server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini || sleep 3600",
+          ]
         resources:
           requests:
             cpu: 0.5
