@@ -51,7 +51,8 @@ properties:
           - name: GF_DATABASE_WAL
             value: "true"
           - name: GF_DATABASE_URL
-            value: "sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL"             - name: prometheus-config-volume
+            value: "sqlite3:///var/lib/grafana/grafana.db?cache=private&mode=rwc&_journal_mode=WAL"
+          - name: prometheus-config-volume
             mountPath: /var/lib/grafana # Keep your persistence mount
             # subPath helps avoid root-level permission issues on the share
             subPath: grafana-data
